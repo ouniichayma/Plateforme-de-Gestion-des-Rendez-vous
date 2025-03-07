@@ -1,0 +1,126 @@
+<div class="dashboard">
+    <header class="dashboard-header">
+        <h2>Tableau de bord</h2>
+        <button onclick="handleLogout()" class="btn-logout">Déconnexion</button>
+    </header>
+    
+    <div class="user-info">
+        <h3>Bienvenue, <%= user.firstName %> <%= user.lastName %></h3>
+        <p>Rôle : <%= user.role %></p>
+    </div>
+
+    <div class="dashboard-actions">
+        <% if (user.role === 'admin') { %>
+            <div class="admin-section">
+                <h3>Administration</h3>
+                <div class="action-buttons">
+                    <button onclick="window.location.href='/users'">Gérer les utilisateurs</button>
+                    <button onclick="window.location.href='/appointments'">Tous les rendez-vous</button>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (user.role === 'professionnel') { %>
+            <div class="pro-section">
+                <h3>Mes rendez-vous</h3>
+                <div class="action-buttons">
+                    <button onclick="window.location.href='/appointments'">Voir mon agenda</button>
+                    <button onclick="window.location.href='/appointments'">Gérer mes disponibilités</button>
+                </div>
+            </div>
+        <% } %>
+
+        <% if (user.role === 'client') { %>
+            <div class="client-section">
+                <h3>Mes rendez-vous</h3>
+                <div class="action-buttons">
+                    <button onclick="window.location.href='/appointments'">Gérer mes rendez-vous</button>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    .dashboard {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .btn-logout {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn-logout:hover {
+        background-color: #c82333;
+    }
+
+    .user-info {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .dashboard-actions {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .action-buttons button {
+        width: 100%;
+        padding: 1rem;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .action-buttons button:hover {
+        background-color: #555;
+    }
+</style>
+
+<script>
+async function handleLogout() {
+    try {
+        // Appeler l'API de déconnexion
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            // Rediriger vers la page de connexion
+            window.location.href = '/login';
+        } else {
+            console.error('Erreur lors de la déconnexion');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
+</script>
