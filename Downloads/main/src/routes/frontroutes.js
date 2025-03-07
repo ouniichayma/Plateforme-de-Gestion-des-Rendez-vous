@@ -8,6 +8,11 @@ const authMiddleware = async (req, res, next) => {
     const token = req.cookies.token;
     
     if (!token) {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
         return res.redirect('/login');
     }
 
@@ -16,7 +21,11 @@ const authMiddleware = async (req, res, next) => {
         const user = await User.findById(decoded.userId);
         
         if (!user) {
-            res.clearCookie('token');
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000
+            });
             return res.redirect('/login');
         }
 
@@ -29,8 +38,12 @@ const authMiddleware = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Erreur d\'authentification:', error);
-        res.clearCookie('token');
-        res.redirect('/login');
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        return res.redirect('/login');
     }
 };
 
@@ -47,18 +60,32 @@ const checkRole = (...roles) => {
     };
 };
 
-// Page d'accueil
+// Page d'accueil - Redirection vers login si non authentifié
 router.get("/", (req, res) => {
     const token = req.cookies.token;
-    if (token) {
-        try {
-            jwt.verify(token, process.env.JWT_SECRET);
-            return res.redirect('/dashboard');
-        } catch (error) {
-            res.clearCookie('token');
-        }
+    if (!token) {
+        return res.redirect('/login');
     }
-    res.render("index", { title: "Accueil" });
+    
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded || !decoded.userId) {
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000
+            });
+            return res.redirect('/login');
+        }
+        return res.redirect('/dashboard');
+    } catch (error) {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+        return res.redirect('/login');
+    }
 });
 
 // Page de connexion
@@ -66,10 +93,16 @@ router.get("/login", (req, res) => {
     const token = req.cookies.token;
     if (token) {
         try {
-            jwt.verify(token, process.env.JWT_SECRET);
-            return res.redirect('/dashboard');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            if (decoded && decoded.userId) {
+                return res.redirect('/dashboard');
+            }
         } catch (error) {
-            res.clearCookie('token');
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000
+            });
         }
     }
     res.render("login", { title: "Connexion" });
@@ -83,7 +116,11 @@ router.get("/register", (req, res) => {
             jwt.verify(token, process.env.JWT_SECRET);
             return res.redirect('/dashboard');
         } catch (error) {
-            res.clearCookie('token');
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000
+            });
         }
     }
     res.render("register", { title: "Inscription" });
@@ -158,7 +195,11 @@ router.get("/appointments", authMiddleware, async (req, res) => {
 
 // Route de déconnexion
 router.get("/logout", (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000
+    });
     res.redirect('/login');
 });
 
