@@ -1,34 +1,112 @@
-<h2>Inscription</h2>
-<form id="registerForm" enctype="multipart/form-data">
-    <label>Nom :</label>
-    <input type="text" id="firstName" name="firstName" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | DentalCare</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("assets/img/carousel-1.jpg");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 750px;
+        }
+        .form-container {
+            width: 50%;
+            padding: 30px;
+        }
+        .image-container {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #E3F2FD;
+        }
+        .doctor-img {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        h2 {
+            color: #1565C0;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #1565C0;
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #90CAF9;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background-color: #1565C0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0D47A1;
+        }
+    </style>
+</head>
+<body>
 
-    <label>Prénom :</label>
-    <input type="text" id="lastName" name="lastName" required>
 
-    <label>Email :</label>
-    <input type="email" id="email" name="email" required>
 
-    <label>Mot de passe :</label>
-    <input type="password" id="password" name="password" required>
-
-    <label>Rôle :</label>
-    <select id="role" name="role" required>
-   
-        <option value="professionnel">Professionnel</option>
-        <option value="client">Client</option>
-    </select>
-
-    <label>Image de profil :</label>
-    <input type="file" id="image" name="image" accept="image/*">
-
-    <button type="submit">S'inscrire</button>
-</form>
-
-<p>Déjà inscrit ? <a href="/login">Se connecter</a></p>
-
-<script>
-  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    <div class="container">
+        <div class="form-container">
+            <h2>Sign Up</h2>
+            <form id="registerForm" enctype="multipart/form-data">
+                <label>First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+                <label>Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+                <label>Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label>Password:</label>
+                <input type="password" id="password" name="password" required>
+                <label>Role:</label>
+                <select id="role" name="role" required>
+                    <option value="client">client</option>
+                    <option value="professionnel">professionnel</option>
+                </select>
+                <label>Profile Picture:</label>
+                <input type="file" id="image" name="image" accept="image/*">
+                <button type="submit">Sign Up</button>
+            </form>
+            <p style="text-align: center;">Already have an account? <a href="/login" style="color: #1565C0;">Log in</a></p>
+        </div>
+        <div class="image-container">
+            <img src="assets/img/service-4.jpg" alt="Doctor" class="doctor-img" id="previewImage">
+        </div>
+    </div>
+    <script>
+       document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault(); // Empêche la soumission classique du formulaire
 
     // Création d'un FormData pour inclure l'image
@@ -49,7 +127,7 @@
       // Envoi de la requête POST au backend
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        body: formData // Pas besoin d'ajouter `Content-Type`, FormData le gère automatiquement
+        body: formData // Pas besoin d'ajouter Content-Type, FormData le gère automatiquement
       });
 
       const result = await response.json();
@@ -65,4 +143,31 @@
       alert("Une erreur est survenue. Veuillez réessayer.");
     }
   });
-</script>
+
+
+
+
+
+
+
+
+
+
+  document.getElementById('image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.getElementById('previewImage').src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    </script>
+</body>
+</html>

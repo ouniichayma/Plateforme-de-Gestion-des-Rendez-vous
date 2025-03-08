@@ -1,15 +1,99 @@
-<h2>Connexion</h2>
-<form id="loginForm">
-    <label>Email :</label>
-    <input type="email" id="email" name="email" required>
-    
-    <label>Mot de passe :</label>
-    <input type="password" id="password" name="password" required>
-    
-    <button type="submit">Se connecter</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | DentalCare</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("assets/img/carousel-1.jpg");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 750px;
+        }
+        .form-container {
+            width: 50%;
+            padding: 30px;
+        }
+        .image-container {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #E3F2FD;
+        }
+        .doctor-img {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        h2 {
+            color: #1565C0;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            color: #1565C0;
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #90CAF9;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background-color: #1565C0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0D47A1;
+        }
+    </style>
+</head>
+<body>
 
-<p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
+    <div class="container">
+        <div class="form-container">
+            <h2>Connexion</h2>
+            <form id="loginForm">
+                <label>Email :</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label>Mot de passe :</label>
+                <input type="password" id="password" name="password" required>
+                
+                <button type="submit">Se connecter</button>
+            </form>
+            <p style="text-align: center;">Pas encore de compte ? <a href="/register" style="color: #1565C0;">S'inscrire</a></p>
+        </div>
+        <div class="image-container">
+            <img src="assets/img/service-4.jpg" alt="Doctor" class="doctor-img">
+        </div>
+    </div>
 
 <script>
   // Récupérer le formulaire

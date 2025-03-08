@@ -86,3 +86,16 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+
+
+
+
+
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000
+  });
+  res.json({ message: 'Déconnexion réussie' });
+};
