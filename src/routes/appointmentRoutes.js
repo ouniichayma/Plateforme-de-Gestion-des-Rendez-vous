@@ -185,6 +185,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Client introuvable" });
     }
 
+    
     // Construire le message de l'email
     let emailSubject = "vous aver annuler votre rendez-vous";
     let emailBody = `Bonjour ${client.firstName},\n\nVotre rendez-vous du ${new Date(
