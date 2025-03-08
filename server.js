@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("./src/config/database");
 const authRoutes = require("./src/routes/authRoutes");
 const appointmentRoutes = require("./src/routes/appointmentRoutes");
-
+const userRoutes = require("./src/routes/userRoutes");
 
 require('./src/services/reminderService');
 const ejsLayouts = require("express-ejs-layouts"); 
@@ -34,12 +34,16 @@ app.use(express.static(path.join(__dirname, "src", "public")));
 // Déclarer frontRoutes avant son utilisation
 const frontRoutes = require("./src/routes/frontroutes");
 
+//stocker les img
 
 
 
 
 
 
+
+// Servir les fichiers statiques depuis le dossier "uploads"
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -57,6 +61,9 @@ app.use("/", frontRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api/appointments", appointmentRoutes);
+
+// Utilisation des routes d'utilisateurs
+app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
