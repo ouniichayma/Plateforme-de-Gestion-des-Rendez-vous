@@ -14,12 +14,16 @@ const path = require("path");
 
 
 
-
+const cookieParser = require("cookie-parser");
 
 
 
 const app = express();
 
+
+
+
+app.use(cookieParser()); // Ajout du middleware pour lire les cookies
 
 
 // Utilisation d'express-ejs-layouts pour gérer les layouts

@@ -66,28 +66,57 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+      const { email, password } = req.body;
 
-    // Vérifier si l'utilisateur existe
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Email ou mot de passe incorrect." });
+      // Vérifier si l'utilisateur existe
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+      }
 
-    // Vérifier le mot de passe
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Email ou mot de passe incorrect." });
+      // Vérifier le mot de passe
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+          return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+      }
 
-    // Générer le token
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+      // Supprimer l'ancien cookie s'il existe
+      res.clearCookie('token');
 
-    res.json({ token, user: { id: user._id, firstName: user.firstName, role: user.role } });
+      // Créer un nouveau token
+      const token = jwt.sign(
+          { 
+              userId: user._id,
+              role: user.role,
+              firstName: user.firstName,
+              lastName: user.lastName
+          }, 
+          process.env.JWT_SECRET,
+          { expiresIn: "24h" }
+      );
+
+      // Définir le cookie avec le token
+      res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 24 * 60 * 60 * 1000 // 24 heures
+      });
+
+      // Envoyer la réponse
+      res.json({ 
+          message: 'Connexion réussie',
+          user: {
+              id: user._id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              role: user.role
+          }
+      });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error });
+      console.error('Erreur lors de la connexion:', error);
+      res.status(500).json({ message: 'Erreur lors de la connexion' });
   }
 };
-
-
 
 
 

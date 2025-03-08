@@ -1,0 +1,257 @@
+<div class="appointments-container">
+    <h2>Gestion des Rendez-vous</h2>
+
+    <div class="filters-section">
+        <h3>Filtres</h3>
+        <form id="filterForm" class="filter-form">
+            <div class="form-group">
+                <label for="professional">Professionnel :</label>
+                <select id="professional" name="professional">
+                    <option value="">Tous les professionnels</option>
+                    <% professionals.forEach(function(pro) { %>
+                        <option value="<%= pro._id %>"><%= pro.firstName %> <%= pro.lastName %></option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Statut :</label>
+                <select id="status" name="status">
+                    <option value="">Tous les statuts</option>
+                    <option value="pending">En attente</option>
+                    <option value="accepted">Accepté</option>
+                    <option value="rejected">Refusé</option>
+                    <option value="cancelled">Annulé</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dateRange">Période :</label>
+                <select id="dateRange" name="dateRange">
+                    <option value="today">Aujourd'hui</option>
+                    <option value="week">Cette semaine</option>
+                    <option value="month">Ce mois</option>
+                    <option value="all">Tous</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Filtrer</button>
+        </form>
+    </div>
+
+    <div class="appointments-list">
+        <h3>Liste des Rendez-vous</h3>
+        <div id="appointmentsList">
+            <!-- Les rendez-vous seront chargés ici dynamiquement -->
+        </div>
+    </div>
+</div>
+
+<style>
+    .appointments-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .filters-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .filter-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    .appointments-list {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .appointment-card {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+
+    .appointment-card h4 {
+        margin: 0 0 0.5rem 0;
+    }
+
+    .appointment-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: bold;
+    }
+
+    .status-pending {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .status-accepted {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+    .status-rejected {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .status-cancelled {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    .appointment-actions {
+        margin-top: 1rem;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    
+    // Gestionnaire pour le formulaire de filtres
+    if (filterForm) {
+        filterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await loadAppointments();
+        });
+    }
+
+    // Fonction pour charger les rendez-vous
+    async function loadAppointments() {
+        try {
+            const professional = document.getElementById('professional').value;
+            const status = document.getElementById('status').value;
+            const dateRange = document.getElementById('dateRange').value;
+
+            const queryParams = new URLSearchParams({
+                professional,
+                status,
+                dateRange
+            }).toString();
+
+            const response = await fetch(`/api/appointments/all?${queryParams}`);
+            const appointments = await response.json();
+            
+            const appointmentsList = document.getElementById('appointmentsList');
+            
+            if (appointments.length === 0) {
+                appointmentsList.innerHTML = '<p>Aucun rendez-vous trouvé</p>';
+                return;
+            }
+
+            appointmentsList.innerHTML = appointments.map(appointment => `
+                <div class="appointment-card">
+                    <h4>Rendez-vous le ${new Date(appointment.date).toLocaleDateString()} à ${appointment.time}</h4>
+                    <p>
+                        <strong>Professionnel:</strong> ${appointment.professional.firstName} ${appointment.professional.lastName}
+                    </p>
+                    <p>
+                        <strong>Client:</strong> ${appointment.client.firstName} ${appointment.client.lastName}
+                    </p>
+                    <p><strong>Motif:</strong> ${appointment.reason}</p>
+                    <p>
+                        <strong>Statut:</strong> 
+                        <span class="appointment-status status-${appointment.status}">
+                            ${appointment.status}
+                        </span>
+                    </p>
+                    <div class="appointment-actions">
+                        <button onclick="deleteAppointment('${appointment._id}')" class="btn-delete">
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Erreur lors du chargement des rendez-vous:', error);
+        }
+    }
+
+    // Fonction pour supprimer un rendez-vous
+    window.deleteAppointment = async function(appointmentId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/appointments/${appointmentId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Rendez-vous supprimé avec succès');
+                loadAppointments();
+            } else {
+                const result = await response.json();
+                alert(result.message || 'Erreur lors de la suppression');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de la suppression');
+        }
+    }
+
+    // Charger les rendez-vous au chargement de la page
+    loadAppointments();
+});
+</script>
