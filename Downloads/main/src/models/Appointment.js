@@ -12,7 +12,7 @@ const appointmentSchema = new mongoose.Schema({
         required: true
     },
     date: {
-        type: Date,
+        type: String,
         required: true
     },
     time: {
@@ -32,6 +32,21 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+});
+
+// Middleware to ensure date and time are properly formatted
+appointmentSchema.pre('save', function(next) {
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(this.date)) {
+        next(new Error('Invalid date format. Use YYYY-MM-DD'));
+    }
+    
+    // Validate time format (HH:mm)
+    if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(this.time)) {
+        next(new Error('Invalid time format. Use HH:mm'));
+    }
+    
+    next();
 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

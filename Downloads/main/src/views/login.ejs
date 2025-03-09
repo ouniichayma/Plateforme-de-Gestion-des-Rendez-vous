@@ -108,14 +108,12 @@
     </div>
 
     <script>
-        // Fonction pour afficher les messages d'erreur
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
         }
 
-        // Fonction pour gérer la connexion
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -124,24 +122,20 @@
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                console.log('Tentative de connexion pour:', email);
-                
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ email, password }),
-                    credentials: 'include' // Important pour les cookies
+                    credentials: 'include'
                 });
 
-                console.log('Réponse reçue:', response.status);
                 const data = await response.json();
-                console.log('Données reçues:', data);
 
                 if (response.ok) {
-                    // Redirection vers le dashboard après connexion réussie
-                    window.location.href = '/dashboard';
+                    // Redirection basée sur le rôle retourné par le serveur
+                    window.location.href = data.redirectUrl || '/dashboard';
                 } else {
                     showError(data.message || 'Erreur de connexion');
                 }

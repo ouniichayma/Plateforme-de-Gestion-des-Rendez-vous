@@ -1,73 +1,187 @@
-<h2>Inscription</h2>
-<form id="registerForm">
-    <label>Nom :</label>
-    <input type="text" id="firstName" name="firstName" required>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    <label>Prénom :</label>
-    <input type="text" id="lastName" name="lastName" required>
+        .register-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
 
-    <label>Email :</label>
-    <input type="email" id="email" name="email" required>
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
 
-    <label>Mot de passe :</label>
-    <input type="password" id="password" name="password" required>
+        .form-group {
+            margin-bottom: 1rem;
+        }
 
-    <label>Rôle :</label>
-    <select id="role" name="role" required>
-        <option value="admin">admin</option>
-        <option value="professionnel">professionnel</option>
-        <option value="client">client</option>
-        
-    </select>
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
 
-    <button type="submit">S'inscrire</button>
-</form>
-<p>Déjà inscrit ? <a href="/login">Se connecter</a></p>
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
 
-<script>
-  // Récupération du formulaire
-  const form = document.getElementById('registerForm');
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Empêche la soumission classique du formulaire
+        button:hover {
+            background-color: #45a049;
+        }
 
-    // Récupérer les données du formulaire
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
+        .error-message {
+            color: #dc3545;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
 
-    // Préparer les données pour la requête
-    const data = {
-      firstName,
-      lastName,
-      email,
-      password,
-      role
-    };
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
 
-    try {
-      // Envoi de la requête POST au backend
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+        .login-link a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
 
-      const result = await response.json();
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>Inscription</h1>
+        <form id="registerForm" onsubmit="return false;">
+            <div class="form-group">
+                <label for="firstName">Prénom</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Nom</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Rôle</label>
+                <select id="role" name="role" required>
+                    <option value="client">Client</option>
+                    <option value="professionnel">Professionnel</option>
+                </select>
+            </div>
+            <button type="submit" onclick="handleRegister()">S'inscrire</button>
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+        <div class="login-link">
+            <p>Déjà inscrit ? <a href="/login">Se connecter</a></p>
+        </div>
+    </div>
 
-      if (response.ok) {
-        alert(result.message); // Affiche un message de succès
-        window.location.href = '/login'; // Redirige vers la page de connexion
-      } else {
-        alert(result.message); // Affiche un message d'erreur
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'inscription', error);
-      alert("Une erreur est survenue. Veuillez réessayer.");
-    }
-  });
-</script>
+    <script>
+        // Clear any existing tokens when the page loads
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        async function handleRegister() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            // Réinitialiser le message d'erreur
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        firstName,
+                        lastName,
+                        email,
+                        password,
+                        role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Clear any existing tokens
+                    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    
+                    // Show success message
+                    alert('Inscription réussie ! Vous allez être redirigé vers la page de connexion.');
+                    
+                    // Redirect to login page
+                    window.location.href = '/login';
+                } else {
+                    showError(data.message || 'Erreur lors de l\'inscription');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Une erreur est survenue lors de l\'inscription');
+            }
+        }
+
+        // Empêcher la soumission du formulaire par défaut
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleRegister();
+        });
+    </script>
+</body>
+</html>

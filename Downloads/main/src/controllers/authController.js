@@ -26,7 +26,17 @@ exports.register = async (req, res) => {
 
         await user.save();
 
-        res.status(201).json({ message: 'Utilisateur créé avec succès' });
+        // S'assurer qu'aucun token n'est présent
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.status(201).json({ 
+            message: 'Utilisateur créé avec succès',
+            redirectUrl: '/login'
+        });
     } catch (error) {
         console.error('Erreur lors de l\'inscription:', error);
         res.status(500).json({ message: 'Erreur lors de l\'inscription' });
@@ -71,9 +81,15 @@ exports.login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000 // 24 heures
         });
 
-        // Envoyer la réponse
+        // Envoyer la réponse avec l'URL de redirection basée sur le rôle
+        let redirectUrl = '/dashboard';
+        if (user.role === 'professionnel') {
+            redirectUrl = '/appointments';
+        }
+
         res.json({ 
             message: 'Connexion réussie',
+            redirectUrl: redirectUrl,
             user: {
                 id: user._id,
                 firstName: user.firstName,
