@@ -18,10 +18,10 @@ cron.schedule('0 * * * *', async () => {
 
         // Envoyer un rappel pour chaque rendez-vous trouvé
         for (const appointment of upcomingAppointments) {
-            await sendEmail(appointment.clientEmail, "Rappel de rendez-vous",
+            await sendEmail(appointment.client.email, "Rappel de rendez-vous",
                 `Bonjour, ceci est un rappel pour votre rendez-vous prévu à ${appointment.date}.`
             );
-            console.log(`📧 Rappel envoyé à ${appointment.clientEmail}`);
+            console.log(`📧 Rappel envoyé à ${appointment.client.email}`);
         }
     } catch (error) {
         console.error("❌ Erreur envoi rappel:", error);

@@ -117,16 +117,20 @@ router.post('/availability', authMiddleware, async (req, res) => {
     }
 });
 
-// Route pour les professionnels - voir leurs rendez-vous
+// Route pour les professionnels - voir leurs rendez-vous// Route pour les professionnels - voir leurs rendez-vous
 router.get('/professional-appointments', authMiddleware, async (req, res) => {
     try {
         if (req.user.role !== 'professionnel') {
             return res.status(403).json({ message: 'Accès non autorisé' });
         }
 
+        console.log('Récupération des rendez-vous pour le professionnel:', req.user.userId);
+
         const appointments = await Appointment.find({ professional: req.user.userId })
             .populate('client', 'firstName lastName')
             .sort({ date: 1, time: 1 });
+
+        console.log('Rendez-vous trouvés:', appointments);
 
         res.json(appointments);
     } catch (error) {
@@ -134,6 +138,7 @@ router.get('/professional-appointments', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Erreur lors de la récupération des rendez-vous' });
     }
 });
+
 
 // Route pour l'admin - voir tous les rendez-vous
 router.get('/all', authMiddleware, async (req, res) => {
@@ -185,7 +190,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Client introuvable" });
     }
 
-    
+
     // Construire le message de l'email
     let emailSubject = "vous aver annuler votre rendez-vous";
     let emailBody = `Bonjour ${client.firstName},\n\nVotre rendez-vous du ${new Date(
@@ -278,5 +283,8 @@ router.put('/:id/:action', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Erreur lors du traitement de la demande' });
     }
 });
+
+
+
 
 module.exports = router;

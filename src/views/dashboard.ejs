@@ -1,147 +1,233 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - Cabinet Dentaire</title>
     <!-- FullCalendar CSS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css' rel='stylesheet' />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Police Google pour un style moderne -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome pour les icônes -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Styles personnalisés -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
 
+        .dashboard {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
 
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #007bff, #00bcd4);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
+        .dashboard-header h2 {
+            margin: 0;
+            font-weight: 600;
+        }
 
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
+        .profile-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
 
+        .btn-logout {
+            background-color: #3066fa;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
 
+        .btn-logout:hover {
+            background-color: #ff6b81;
+        }
 
+        .user-info {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
+        .user-info h3 {
+            color: #007bff;
+            font-weight: 600;
+        }
 
-    
+        .user-info p {
+            color: #666;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            gap: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-buttons button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #007bff, #00bcd4);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .action-buttons button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #calendar {
+            margin-top: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 4 4px 6px rgba(0, 0, 0, 0.1);
+            height: 1100px;
+        }
+
+        .fc-event {
+            cursor: pointer;
+            background: #d2e1f1;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .fc-event-title {
+            font-weight: bold;
+        }
+
+        .doctor-dentist-section {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 12px;
+        }
+    </style>
 </head>
 <body>
-<div class="dashboard">
-    <header class="dashboard-header">
-        <h2>Tableau de bord</h2>
-        <button onclick="handleLogout()" class="btn-logout">Déconnexion</button>
-    </header>
-    
-    <div class="user-info">
-        <h3>Bienvenue, <%= user.firstName %> <%= user.lastName %></h3>
-        <p>Rôle : <%= user.role %></p>
+    <div class="dashboard">
+        <!-- En-tête du tableau de bord -->
+        <header class="dashboard-header">
+            <h2>Tableau de Bord - Cabinet Dentaire</h2>
+         
+            <div class="user-profile">
+               
+            
+                <% if (user && user.image) { %>
+                    <img src="<%=user.image %>" class="profile-image">
+
+                    <%= console.log("Image de l'utilisateur :", user.image) %>
+                <% } else { %>
+                    <img src="/uploads/default-profile.jpg" class="profile-image">
+                    <%= console.log("Image de l'utilisateur :", user.image) %>
+                    <%= console.log("email de l'utilisateur :", user.email) %>
+                    <%= console.log("lastName de l'utilisateur :", user.lastName) %>
+                    <%= console.log("Utilisateur récupéré :", user); %>
+                <% } %>
+             
+                <button onclick="handleLogout()" class="btn-logout">Déconnexion <i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <!-- Informations de l'utilisateur -->
+        <div class="user-info">
+            <h3>Bienvenue,<%= user.firstName %> <%= user.lastName %></h3>
+        
+            <p>Rôle : <%= user.role %></p>
+        </div>
+
+        <!-- Actions du tableau de bord -->
+        <div class="dashboard-actions">
+            <% if (user.role === 'admin') { %>
+                <div class="admin-section">
+                    <h3 class="text-primary mb-4">Administration</h3>
+                    <div class="action-buttons">
+                        <button onclick="window.location.href='/users'">Gérer les utilisateurs</button>
+                        <button onclick="window.location.href='/appointments'">Tous les rendez-vous</button>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (user.role === 'professionnel') { %>
+                <div class="pro-section">
+                    <h3 class="text-primary mb-4">Mes rendez-vous</h3>
+                    <div class="action-buttons">
+                        <button onclick="window.location.href='/appointments'">Voir mon agenda</button>
+                        <button onclick="window.location.href='/appointments'">Gérer mes disponibilités</button>
+                    </div>
+
+                    <div id="calendar"></div>
+                   
+                   
+                </div>
+            <% } %>
+
+            <% if (user.role === 'client') { %>
+                <div class="client-section">
+                    <h3 class="text-primary mb-4">Mes rendez-vous</h3>
+                    <div class="action-buttons mb-4">
+                        <button onclick="window.location.href='/appointments'">Gérer mes rendez-vous</button>
+                    </div>
+                    <div id="calendar"></div>
+                </div>
+            <% } %>
+
+            <% if (user.role === 'doctor' || user.role === 'dentist') { %>
+                <div class="doctor-dentist-section">
+                    <h3 class="text-primary mb-4">Mes patients</h3>
+                    <div class="action-buttons">
+                        <button onclick="window.location.href='/patients'">Voir mes patients</button>
+                        <button onclick="window.location.href='/appointments'">Voir mes rendez-vous</button>
+                        <button onclick="window.location.href='/availability'">Gérer mes disponibilités</button>
+                    </div>
+                </div>
+            <% } %>
+        </div>
     </div>
-
-    <div class="dashboard-actions">
-        <% if (user.role === 'admin') { %>
-            <div class="admin-section">
-                <h3>Administration</h3>
-                <div class="action-buttons">
-                    <button onclick="window.location.href='/users'">Gérer les utilisateurs</button>
-                    <button onclick="window.location.href='/appointments'">Tous les rendez-vous</button>
-                </div>
-            </div>
-        <% } %>
-
-        <% if (user.role === 'professionnel') { %>
-            <div class="pro-section">
-                <h3>Mes rendez-vous</h3>
-                <div class="action-buttons">
-                    <button onclick="window.location.href='/appointments'">Voir mon agenda</button>
-                    <button onclick="window.location.href='/appointments'">Gérer mes disponibilités</button>
-                </div>
-            </div>
-        <% } %>
-
-        <% if (user.role === 'client') { %>
-            <div class="client-section">
-                <h3>Mes rendez-vous</h3>
-                <div class="action-buttons mb-4">
-                    <button onclick="window.location.href='/appointments'">Gérer mes rendez-vous</button>
-                </div>
-                <div id="calendar"></div>
-            </div>
-        <% } %>
-    </div>
-</div>
-
-<style>
-    .dashboard {
-        background: white;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .btn-logout {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-
-    .btn-logout:hover {
-        background-color: #c82333;
-    }
-
-    .user-info {
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .dashboard-actions {
-        display: grid;
-        gap: 2rem;
-    }
-
-    .action-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .action-buttons button {
-        width: 100%;
-        padding: 1rem;
-        background-color: #333;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .action-buttons button:hover {
-        background-color: #555;
-    }
-
-    #calendar {
-        margin-top: 2rem;
-        background: white;
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        height: 700px;
-    }
-
-    .fc-event {
-        cursor: pointer;
-    }
-
-    .fc-event-title {
-        font-weight: bold;
-    }
-</style>
 
 <!-- FullCalendar JS -->
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
@@ -186,7 +272,8 @@ async function initializeCalendar() {
             backgroundColor: getStatusColor(apt.status),
             extendedProps: {
                 status: apt.status,
-                description: apt.reason || 'Pas de description'
+                description: apt.reason || 'Pas de description',
+                clientName: `${apt.client.firstName} ${apt.client.lastName}` // Ajouter le nom du client
             }
         }));
 
@@ -226,11 +313,18 @@ function getStatusColor(status) {
 function showAppointmentDetails(event) {
     const props = event.extendedProps;
     alert(`
+        Client: ${props.clientName}
         Status: ${props.status}
         Description: ${props.description}
         Date: ${event.start.toLocaleDateString('fr-FR')}
     `);
 }
+
+
+
+
+
+
 </script>
 </body>
 </html>

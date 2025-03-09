@@ -33,6 +33,8 @@ const authMiddleware = async (req, res, next) => {
             id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
+            email: user.email,
+            image: user.image,
             role: user.role
         };
         next();
@@ -139,12 +141,29 @@ router.get("/register", (req, res) => {
 });
 
 // Dashboard (protégé)
-router.get("/dashboard", authMiddleware, (req, res) => {
+router.get("/dashboard", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    console.log("Utilisateur récupéré depuis la base de données :", user); // Log pour déboguer
+    console.log("Image de l'utilisateur :", user.image); // Log pour déboguer
+    console.log("Email de l'utilisateur :", user.email); // Log pour déboguer
+    console.log("Nom de l'utilisateur :", user.lastName); // Log pour déboguer
+
     res.render("dashboard", { 
         title: "Tableau de bord",
-        user: req.user
+        user: user, // Passer l'objet user complet
+        image: user.image || 'default-profile.jpg' // Image par défaut si user.image est undefined
     });
+  } catch (error) {
+    console.error("Erreur lors du chargement du dashboard :", error);
+    res.status(500).send("Erreur serveur");
+  }
 });
+
 
 // Routes spécifiques aux rôles
 router.get("/users", authMiddleware, checkRole('admin'), async (req, res) => {
@@ -214,5 +233,28 @@ router.get("/logout", (req, res) => {
     });
     res.redirect('/login');
 });
+
+
+
+router.get('/professional-appointments', authMiddleware, async (req, res) => {
+  try {
+      if (req.user.role !== 'professionnel') {
+          return res.status(403).json({ message: 'Accès non autorisé' });
+      }
+
+      const appointments = await Appointment.find({ professional: req.user.id }) // Utilisez req.user.id
+          .populate('client', 'firstName lastName')
+          .sort({ date: 1, time: 1 });
+
+      res.json(appointments);
+  } catch (error) {
+      console.error('Erreur:', error);
+      res.status(500).json({ message: 'Erreur lors de la récupération des rendez-vous' });
+  }
+});
+
+
+
+
 
 module.exports = router;

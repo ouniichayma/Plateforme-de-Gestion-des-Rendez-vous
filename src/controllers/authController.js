@@ -89,7 +89,8 @@ exports.login = async (req, res) => {
               userId: user._id,
               role: user.role,
               firstName: user.firstName,
-              lastName: user.lastName
+              lastName: user.lastName,
+              image: user.image || '', 
           }, 
           process.env.JWT_SECRET,
           { expiresIn: "24h" }
@@ -109,7 +110,8 @@ exports.login = async (req, res) => {
               id: user._id,
               firstName: user.firstName,
               lastName: user.lastName,
-              role: user.role
+              role: user.role,
+              image: user.image,
           }
       });
   } catch (error) {
