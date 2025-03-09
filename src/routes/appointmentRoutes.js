@@ -245,8 +245,9 @@ router.put('/:id/:action', authMiddleware, async (req, res) => {
             return res.status(403).json({ message: 'Vous n\'avez pas le droit de modifier ce rendez-vous' });
         }
 
-        appointment.status = action === 'accepted' ? 'accepted' : 'rejected';
-      
+        appointment.status = action === 'accept' ? 'accepted' : 'rejected';
+
+    
 
         await appointment.save();
 
@@ -277,14 +278,12 @@ router.put('/:id/:action', authMiddleware, async (req, res) => {
 
     console.log(`📩 E-mail de statut envoyé à ${client.email}`);
 
-        res.json({ message: `Rendez-vous ${action === 'accept' ? 'accepté' : 'refusé'} avec succès` });
+        res.json({ message: `Rendez-vous ${action === 'accept' ? 'accepted' : 'refusé'} avec succès` });
     } catch (error) {
         console.error('Erreur:', error);
         res.status(500).json({ message: 'Erreur lors du traitement de la demande' });
     }
 });
-
-
 
 
 module.exports = router;
