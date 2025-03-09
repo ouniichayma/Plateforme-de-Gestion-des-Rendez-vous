@@ -102,7 +102,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-success" id="acceptBtn">Accepter</button>
+                    <button type="button" class="btn btn-primary" id="acceptBtn">Accepter</button>
                     <button type="button" class="btn btn-danger" id="rejectBtn">Refuser</button>
                 </div>
             </div>
@@ -215,13 +215,13 @@
         }
 
         function getActionButtons(appointment) {
-            let buttons = `<button id="view-${appointment._id}" class="btn btn-sm btn-info me-2">
+            let buttons = `<button id="view-${appointment._id}" class="btn btn-sm btn-primary me-2">
                             <i class="bi bi-eye"></i> Voir
                         </button>`;
 
             if (appointment.status === 'pending') {
                 buttons += `
-                    <button onclick="updateAppointmentStatus('${appointment._id}', 'accepted')" class="btn btn-sm btn-success me-2">
+                    <button onclick="updateAppointmentStatus('${appointment._id}', 'accepted')" class="btn btn-sm btn-primary me-2">
                         <i class="bi bi-check-circle"></i> Accepter
                     </button>
                     <button onclick="updateAppointmentStatus('${appointment._id}', 'rejected')" class="btn btn-sm btn-danger">

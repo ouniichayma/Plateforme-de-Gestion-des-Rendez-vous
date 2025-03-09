@@ -20,9 +20,24 @@
             padding: 2px;
         }
         .status-pending { background-color: #ffc107 !important; color: #000 !important; }
-        .status-accepted { background-color: #198754 !important; color: #fff !important; }
+        .status-accepted { background-color: #0d6efd !important; color: #fff !important; }
         .status-rejected { background-color: #dc3545 !important; color: #fff !important; }
         .status-cancelled { background-color: #6c757d !important; color: #fff !important; }
+        
+        /* Personnalisation des boutons FullCalendar */
+        .fc .fc-button-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .fc .fc-button-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0b5ed7;
+        }
+        .fc .fc-button-primary:not(:disabled):active,
+        .fc .fc-button-primary:not(:disabled).fc-button-active {
+            background-color: #0b5ed7;
+            border-color: #0b5ed7;
+        }
     </style>
 </head>
 <body>
