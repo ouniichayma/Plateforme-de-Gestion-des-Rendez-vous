@@ -37,39 +37,34 @@ const authMiddleware = async (req, res, next) => {
 
 // Page de connexion
 router.get('/login', (req, res) => {
-    const token = req.cookies.token;
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            return res.redirect('/dashboard');
-        } catch (error) {
-            res.clearCookie('token');
-        }
-    }
-    res.render('login', { title: 'Connexion' });
+    res.render('login', { 
+        title: 'Connexion',
+        layout: false 
+    });
 });
 
 // Page d'inscription
 router.get('/register', (req, res) => {
-    const token = req.cookies.token;
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            return res.redirect('/dashboard');
-        } catch (error) {
-            res.clearCookie('token');
-        }
-    }
-    res.render('register', { title: 'Inscription' });
+    res.render('register', { 
+        title: 'Inscription',
+        layout: false 
+    });
 });
 
 // Dashboard (protégé)
 router.get('/dashboard', authMiddleware, async (req, res) => {
     try {
-        if (req.user.role === 'professionnel' || req.user.role === 'client') {
-            return res.render('dashboard', {
-                title: req.user.role === 'professionnel' ? 'Espace Professionnel' : 'Espace Client',
-                user: req.user
+        if (req.user.role === 'professionnel') {
+            return res.render('dashboard-professional', {
+                title: 'Espace Professionnel',
+                user: req.user,
+                layout: false
+            });
+        } else if (req.user.role === 'client') {
+            return res.render('dashboard-client', {
+                title: 'Espace Client',
+                user: req.user,
+                layout: false
             });
         } else {
             res.clearCookie('token');
@@ -90,7 +85,8 @@ router.get('/appointments/list', authMiddleware, async (req, res) => {
         }
         res.render('appointments-list', {
             title: 'Liste des Rendez-vous',
-            user: req.user
+            user: req.user,
+            layout: false
         });
     } catch (error) {
         console.error('Erreur liste des rendez-vous:', error);
@@ -113,7 +109,8 @@ router.get('/appointments/new', authMiddleware, async (req, res) => {
         res.render('new-appointment', { 
             title: 'Nouveau Rendez-vous',
             user: req.user,
-            professionals: professionals
+            professionals: professionals,
+            layout: false
         });
     } catch (error) {
         console.error('Erreur nouveau rendez-vous:', error);

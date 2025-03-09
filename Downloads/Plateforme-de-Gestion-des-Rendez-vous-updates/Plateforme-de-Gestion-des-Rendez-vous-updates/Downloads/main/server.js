@@ -37,15 +37,6 @@ const frontRoutes = require("./src/routes/frontroutes");
 
 // Route racine
 app.get('/', (req, res) => {
-    const token = req.cookies.token;
-    if (token) {
-        try {
-            jwt.verify(token, process.env.JWT_SECRET);
-            return res.redirect('/dashboard');
-        } catch (error) {
-            res.clearCookie('token');
-        }
-    }
     res.render('login', { 
         title: 'Connexion',
         layout: false
