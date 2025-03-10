@@ -1,0 +1,164 @@
+<%- include('partials/header') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Menu latéral -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <div class="user-profile mb-4 p-3">
+                    <h5><%= user.firstName %> <%= user.lastName %></h5>
+                    <p class="text-muted mb-0">Professionnel</p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard-professional">
+                            <i class="bi bi-house-door"></i>
+                            Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Deconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Gestion des Rendez-vous</h1>
+            </div>
+
+            <div class="row">
+                <!-- Liste des rendez-vous -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Liste des rendez-vous</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="appointmentsList" class="list-group">
+                                <!-- Les rendez-vous seront ajoutés ici dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Fonction pour formater la date
+    function formatDate(dateString) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('fr-FR', options);
+    }
+
+    // Fonction pour charger les rendez-vous
+    async function loadAppointments() {
+        try {
+            const response = await fetch('/api/appointments/my-appointments');
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des rendez-vous');
+            }
+            
+            const appointments = await response.json();
+            const appointmentsList = document.getElementById('appointmentsList');
+            appointmentsList.innerHTML = '';
+
+            if (appointments.length === 0) {
+                appointmentsList.innerHTML = '<div class="alert alert-info">Vous n\'avez aucun rendez-vous programmé.</div>';
+                return;
+            }
+
+            appointments.forEach(appointment => {
+                const statusClass = `status-${appointment.status}`;
+                const statusText = {
+                    'pending': 'En attente',
+                    'accepted': 'Accepté',
+                    'rejected': 'Refusé',
+                    'cancelled': 'Annulé'
+                }[appointment.status];
+
+                const clientName = appointment.client ? 
+                    `${appointment.client.firstName} ${appointment.client.lastName}` : 
+                    'Client non assigné';
+
+                const card = `
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Client: ${clientName}</h6>
+                                <p class="mb-1">Date: ${formatDate(appointment.date)}</p>
+                                <p class="mb-1">Heure: ${appointment.time}</p>
+                                <p class="mb-1">Motif: ${appointment.reason}</p>
+                                <p class="mb-1">Statut: <span class="${statusClass}">${statusText}</span></p>
+                            </div>
+                            ${appointment.status === 'pending' ? `
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('${appointment._id}', 'accepted')">
+                                        <i class="bi bi-check-circle"></i> Accepter
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus('${appointment._id}', 'rejected')">
+                                        <i class="bi bi-x-circle"></i> Refuser
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                appointmentsList.innerHTML += card;
+            });
+        } catch (error) {
+            console.error('Erreur:', error);
+            document.getElementById('appointmentsList').innerHTML = 
+                '<div class="alert alert-danger">Erreur lors du chargement des rendez-vous. Veuillez réessayer.</div>';
+        }
+    }
+
+    // Fonction pour mettre à jour le statut d'un rendez-vous
+    async function updateStatus(id, status) {
+        try {
+            const response = await fetch(`/api/appointments/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (response.ok) {
+                alert(`Rendez-vous ${status === 'accepted' ? 'accepté' : 'refusé'} avec succès`);
+                loadAppointments();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Erreur lors de la mise à jour du rendez-vous');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la mise à jour du rendez-vous');
+        }
+    }
+
+    // Gestion de la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/logout';
+    });
+
+    // Charger les rendez-vous au chargement de la page
+    document.addEventListener('DOMContentLoaded', loadAppointments);
+</script>
+
+<style>
+    .status-pending { color: #ffc107; }
+    .status-accepted { color: #28a745; }
+    .status-rejected { color: #dc3545; }
+    .status-cancelled { color: #6c757d; }
+</style>
+
+<%- include('partials/footer') %>

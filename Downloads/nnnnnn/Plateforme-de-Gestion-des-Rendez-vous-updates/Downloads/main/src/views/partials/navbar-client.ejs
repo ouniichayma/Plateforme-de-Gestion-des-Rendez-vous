@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="bi bi-calendar2-check"></i>
+            Espace Client
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/appointments/my">
+                        <i class="bi bi-list-ul"></i> Mes rendez-vous
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/appointments/new">
+                        <i class="bi bi-plus-circle"></i> Nouveau rendez-vous
+                    </a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text me-3 text-white">
+                    <i class="bi bi-person"></i> <%= user.firstName %> <%= user.lastName %>
+                </span>
+                <button class="btn btn-outline-light" onclick="handleLogout()">
+                    <i class="bi bi-box-arrow-right"></i> Deconnexion
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>

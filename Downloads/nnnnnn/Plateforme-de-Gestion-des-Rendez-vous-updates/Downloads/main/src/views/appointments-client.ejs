@@ -1,0 +1,245 @@
+<%- include('partials/header') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Menu latéral -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <div class="user-profile mb-4 p-3">
+                    <h5><%= user.firstName %> <%= user.lastName %></h5>
+                    <p class="text-muted mb-0">Client</p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">
+                            <i class="bi bi-house-door"></i>
+                            Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Deconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Mes Rendez-vous</h1>
+            </div>
+
+            <!-- Formulaire de prise de rendez-vous -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Prendre un rendez-vous</h4>
+                </div>
+                <div class="card-body">
+                    <form id="appointmentForm">
+                        <div class="mb-3">
+                            <label for="professional" class="form-label">Professionnel</label>
+                            <select class="form-control" id="professional" required>
+                                <option value="">Selectionnez un professionnel</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Heure</label>
+                            <input type="time" class="form-control" id="time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Motif</label>
+                            <textarea class="form-control" id="reason" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Prendre rendez-vous</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des rendez-vous -->
+            <h3>Mes rendez-vous programmes</h3>
+            <div id="appointmentsList" class="row">
+                <!-- Les rendez-vous seront ajoutés ici dynamiquement -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Fonction pour charger les professionnels
+    async function loadProfessionals() {
+        try {
+            const response = await fetch('/api/appointments/professionals');
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des professionnels');
+            }
+            const professionals = await response.json();
+            const selectProfessional = document.getElementById('professional');
+            selectProfessional.innerHTML = '<option value="">Sélectionnez un professionnel</option>';
+            
+            professionals.forEach(prof => {
+                const option = document.createElement('option');
+                option.value = prof._id;
+                option.textContent = `${prof.firstName} ${prof.lastName}`;
+                selectProfessional.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors du chargement des professionnels');
+        }
+    }
+
+    // Fonction pour formater la date
+    function formatDate(dateString) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('fr-FR', options);
+    }
+
+    // Fonction pour charger les rendez-vous
+    async function loadAppointments() {
+        try {
+            const response = await fetch('/api/appointments/my-appointments');
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des rendez-vous');
+            }
+            
+            const appointments = await response.json();
+            const appointmentsList = document.getElementById('appointmentsList');
+            appointmentsList.innerHTML = '';
+
+            if (appointments.length === 0) {
+                appointmentsList.innerHTML = '<div class="col-12"><div class="alert alert-info">Vous n\'avez aucun rendez-vous programmé.</div></div>';
+                return;
+            }
+
+            appointments.forEach(appointment => {
+                const statusClass = `status-${appointment.status}`;
+                const statusText = {
+                    'pending': 'En attente',
+                    'accepted': 'Accepté',
+                    'rejected': 'Refusé',
+                    'cancelled': 'Annulé'
+                }[appointment.status];
+
+                const professionalName = appointment.professional ? 
+                    `${appointment.professional.firstName} ${appointment.professional.lastName}` : 
+                    'Non assigné';
+
+                const card = `
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Rendez-vous avec ${professionalName}</h5>
+                                <p class="card-text">
+                                    <strong>Date:</strong> ${formatDate(appointment.date)}<br>
+                                    <strong>Heure:</strong> ${appointment.time}<br>
+                                    <strong>Motif:</strong> ${appointment.reason}<br>
+                                    <strong>Statut:</strong> <span class="${statusClass}">${statusText}</span>
+                                </p>
+                                ${appointment.status === 'pending' ? `
+                                    <button class="btn btn-danger btn-sm" onclick="cancelAppointment('${appointment._id}')">
+                                        Annuler
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                appointmentsList.innerHTML += card;
+            });
+        } catch (error) {
+            console.error('Erreur:', error);
+            document.getElementById('appointmentsList').innerHTML = 
+                '<div class="col-12"><div class="alert alert-danger">Erreur lors du chargement des rendez-vous. Veuillez réessayer.</div></div>';
+        }
+    }
+
+    // Fonction pour annuler un rendez-vous
+    async function cancelAppointment(id) {
+        if (!confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/appointments/${id}/cancel`, {
+                method: 'PUT'
+            });
+
+            if (response.ok) {
+                alert('Rendez-vous annulé avec succès');
+                loadAppointments();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Erreur lors de l\'annulation du rendez-vous');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de l\'annulation du rendez-vous');
+        }
+    }
+
+    // Gérer la soumission du formulaire
+    document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            professionalId: document.getElementById('professional').value,
+            date: document.getElementById('date').value,
+            time: document.getElementById('time').value,
+            reason: document.getElementById('reason').value
+        };
+
+        try {
+            const response = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Rendez-vous créé avec succès');
+                document.getElementById('appointmentForm').reset();
+                loadAppointments();
+            } else {
+                alert(data.message || 'Erreur lors de la création du rendez-vous');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la création du rendez-vous');
+        }
+    });
+
+    // Gestion de la déconnexion
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/logout';
+    });
+
+    // Définir la date minimum à aujourd'hui
+    const dateInput = document.getElementById('date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+
+    // Charger les données au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProfessionals();
+        loadAppointments();
+    });
+</script>
+
+<style>
+    .status-pending { color: #ffc107; }
+    .status-accepted { color: #28a745; }
+    .status-rejected { color: #dc3545; }
+    .status-cancelled { color: #6c757d; }
+</style>
