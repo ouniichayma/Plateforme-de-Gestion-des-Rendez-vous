@@ -166,3 +166,35 @@ exports.updateAppointmentStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
+
+
+
+
+
+
+exports.filtreAllAppointments = async (req, res) => {
+  try {
+      const { professional, status } = req.query;
+
+      let filter = {};
+      if (professional) {
+          filter.professional = professional;
+      }
+      if (status) {
+          filter.status = status;
+      }
+
+      const appointments = await Appointment.find(filter).populate('professional client');
+      const users = await User.find();
+
+      res.status(200).json({ users, appointments });
+  } catch (error) {
+      res.status(500).json({ message: "Erreur serveur", error });
+  }
+};
+
+

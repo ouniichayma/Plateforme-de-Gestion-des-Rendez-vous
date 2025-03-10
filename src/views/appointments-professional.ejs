@@ -1,53 +1,22 @@
 <div class="appointments-container">
     <h2>Gestion de mon Agenda</h2>
-
-    <div class="availability-section">
-        <h3>Mes Disponibilités</h3>
-        <form id="availabilityForm" class="availability-form">
-            <div class="form-group">
-                <label for="date">Date :</label>
-                <input type="date" id="date" name="date" required min="<%= new Date().toISOString().split('T')[0] %>">
-            </div>
-
-            <div class="form-group">
-                <label>Heures disponibles :</label>
-                <div class="time-slots">
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-09" name="times[]" value="09:00">
-                        <label for="time-09">09:00</label>
-                    </div>
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-10" name="times[]" value="10:00">
-                        <label for="time-10">10:00</label>
-                    </div>
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-11" name="times[]" value="11:00">
-                        <label for="time-11">11:00</label>
-                    </div>
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-14" name="times[]" value="14:00">
-                        <label for="time-14">14:00</label>
-                    </div>
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-15" name="times[]" value="15:00">
-                        <label for="time-15">15:00</label>
-                    </div>
-                    <div class="time-slot">
-                        <input type="checkbox" id="time-16" name="times[]" value="16:00">
-                        <label for="time-16">16:00</label>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-primary">Enregistrer les disponibilités</button>
-        </form>
-    </div>
-
     <div class="appointments-list">
         <h3>Mes Rendez-vous</h3>
-        <div id="appointmentsList">
-            <!-- Les rendez-vous seront chargés ici dynamiquement -->
-        </div>
+        <table id="appointmentsTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Client</th>
+                    <th>Motif</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les rendez-vous seront chargés ici dynamiquement -->
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -56,92 +25,41 @@
         max-width: 1200px;
         margin: 0 auto;
         padding: 2rem;
+        background: #e6f7ff; /* Fond bleu clair */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .availability-section {
-        background: white;
-        padding: 2rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-
-    .availability-form {
-        max-width: 600px;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
-    }
-
-    .time-slots {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 1rem;
-        margin-top: 0.5rem;
-    }
-
-    .time-slot {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .time-slot input[type="checkbox"] {
-        width: auto;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 1rem;
-    }
-
-    .btn-primary {
-        background-color: #4CAF50;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        width: 100%;
-    }
-
-    .btn-primary:hover {
-        background-color: #45a049;
+    h2, h3 {
+        color: #0056b3; /* Bleu foncé */
     }
 
     .appointments-list {
         background: white;
         padding: 2rem;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .appointment-card {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-    }
-
-    .appointment-card h4 {
-        margin: 0 0 0.5rem 0;
-    }
-
-    .appointment-actions {
+    table {
+        width: 100%;
+        border-collapse: collapse;
         margin-top: 1rem;
-        display: flex;
-        gap: 0.5rem;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #007bff; /* Bleu */
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
     }
 
     .btn-accept,
@@ -154,11 +72,11 @@
     }
 
     .btn-accept {
-        background-color: #28a745;
+        background-color: #28a745; /* Vert */
     }
 
     .btn-reject {
-        background-color: #dc3545;
+        background-color: #dc3545; /* Rouge */
     }
 
     .btn-accept:hover {
@@ -172,74 +90,37 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const availabilityForm = document.getElementById('availabilityForm');
-    
-    // Gestionnaire pour le formulaire de disponibilités
-    if (availabilityForm) {
-        availabilityForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const selectedTimes = Array.from(document.querySelectorAll('input[name="times[]"]:checked'))
-                .map(checkbox => checkbox.value);
-
-            const formData = {
-                date: document.getElementById('date').value,
-                times: selectedTimes
-            };
-
-            try {
-                const response = await fetch('/api/appointments/availability', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert('Disponibilités enregistrées avec succès !');
-                } else {
-                    alert(result.message || 'Erreur lors de l\'enregistrement des disponibilités');
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue lors de l\'enregistrement des disponibilités');
-            }
-        });
-    }
-
     // Fonction pour charger les rendez-vous
     async function loadAppointments() {
         try {
             const response = await fetch('/api/appointments/professional-appointments');
             const appointments = await response.json();
             
-            const appointmentsList = document.getElementById('appointmentsList');
+            const appointmentsTableBody = document.querySelector('#appointmentsTable tbody');
             
             if (appointments.length === 0) {
-                appointmentsList.innerHTML = '<p>Aucun rendez-vous</p>';
+                appointmentsTableBody.innerHTML = '<tr><td colspan="6">Aucun rendez-vous</td></tr>';
                 return;
             }
 
-            appointmentsList.innerHTML = appointments.map(appointment => `
-                <div class="appointment-card">
-                    <h4>Rendez-vous le ${new Date(appointment.date).toLocaleDateString()} à ${appointment.time}</h4>
-                    <p><strong>Client:</strong> ${appointment.client.firstName} ${appointment.client.lastName}</p>
-                    <p><strong>Motif:</strong> ${appointment.reason}</p>
-                    <p><strong>Statut:</strong> ${appointment.status}</p>
-                    ${appointment.status === 'pending' ? `
-                        <div class="appointment-actions">
+            appointmentsTableBody.innerHTML = appointments.map(appointment => `
+                <tr>
+                    <td>${new Date(appointment.date).toLocaleDateString()}</td>
+                    <td>${appointment.time}</td>
+                    <td>${appointment.client ? `${appointment.client.firstName} ${appointment.client.lastName}` : 'Inconnu'}</td>
+                    <td>${appointment.reason}</td>
+                    <td>${appointment.status}</td>
+                    <td>
+                        ${appointment.status === 'pending' ? `
                             <button onclick="handleAppointment('${appointment._id}', 'accept')" class="btn-accept">
                                 Accepter
                             </button>
                             <button onclick="handleAppointment('${appointment._id}', 'reject')" class="btn-reject">
                                 Refuser
                             </button>
-                        </div>
-                    ` : ''}
-                </div>
+                        ` : ''}
+                    </td>
+                </tr>
             `).join('');
         } catch (error) {
             console.error('Erreur lors du chargement des rendez-vous:', error);

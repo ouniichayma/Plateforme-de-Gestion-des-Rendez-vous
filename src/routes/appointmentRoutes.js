@@ -8,6 +8,7 @@ const User = require('../models/User');
 
 
 const { sendEmail } = require("../services/emailService"); 
+const { filtreAllAppointments } = require("../controllers/appointmentController");
 
 
 
@@ -176,10 +177,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         if (req.user.role === 'professionnel' && appointment.professional.toString() !== req.user.userId) {
             return res.status(403).json({ message: 'Vous n\'avez pas le droit d\'annuler ce rendez-vous' });
         }
-
         appointment.status = 'cancelled';
-        // Mettre à jour le statut
-    appointment.status = status;
+
         await appointment.save();
 
 
@@ -284,6 +283,20 @@ router.put('/:id/:action', authMiddleware, async (req, res) => {
         res.status(500).json({ message: 'Erreur lors du traitement de la demande' });
     }
 });
+
+
+
+
+
+
+
+
+
+
+router.get('/filtre', filtreAllAppointments);
+
+
+
 
 
 module.exports = router;

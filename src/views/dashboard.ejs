@@ -146,6 +146,199 @@
             padding: 1rem;
             border-radius: 12px;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*liste des users*/
+
+        .users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.user-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.user-card h4 {
+    margin-bottom: 5px;
+    font-size: 18px;
+    color: #333;
+}
+
+.user-card p {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.user-card button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.user-card button:hover {
+    background: #0056b3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Styles pour la modale */
+.modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+.modal-content { background: white; padding: 20px; border-radius: 8px; width: 300px; text-align: center; }
+.close { cursor: pointer; float: right; font-size: 24px; }
+
+
+
+
+
+
+.modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    fieldset {
+        border: none;
+        padding: 10px;
+        margin: 20px 0;
+    }
+
+    legend {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+
+    label {
+        font-weight: bold;
+        margin: 8px 0;
+        display: block;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .form-actions {
+        margin-top: 15px;
+        text-align: right;
+    }
+
+    .form-actions button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .form-actions button.cancel {
+        background-color: #ccc;
+    }
+
+    .form-actions button:hover {
+        background-color: #0056b3;
+    }
+
+    .form-actions button.cancel:hover {
+        background-color: #999;
+    }
+
+
     </style>
 </head>
 <body>
@@ -186,9 +379,74 @@
                 <div class="admin-section">
                     <h3 class="text-primary mb-4">Administration</h3>
                     <div class="action-buttons">
-                        <button onclick="window.location.href='/users'">Gérer les utilisateurs</button>
+                        <button onclick="fetchUsers()">Gérer les utilisateurs</button>
+
                         <button onclick="window.location.href='/appointments'">Tous les rendez-vous</button>
                     </div>
+
+
+
+
+
+
+
+
+
+                  
+                    <div class="container">
+                        <h3>Statistiques des Utilisateurs</h3>
+                
+                        <!-- Canvas pour afficher le graphique -->
+                        <canvas id="userStatsChart" width="400" height="200"></canvas>
+                    </div>
+
+
+
+
+
+
+                    <div id="users-list" class="mt-4">
+                       
+                        <div id="users-container" class="users-grid">
+                            <!-- Les utilisateurs seront ajoutés ici -->
+                        </div>
+                    </div>
+                    
+                    
+
+
+
+
+
+
+
+                    <!-- Modale pour modifier l'utilisateur -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Modifier l'utilisateur</h2>
+        <form id="editUserForm">
+            <label for="editFirstName">First Name :</label>
+            <input type="text" id="editFirstName" name="firstName">
+            <br>
+            <label for="editLastName">Last Name :</label>
+            <input type="text" id="editLastName" name="lastName">
+            
+            <br>
+            <label for="editEmail">Email :</label>
+            <input type="email" id="editEmail" name="email">
+            <br>
+            <label for="editRole">Rôle :</label>
+            <input type="text" id="editRole" name="role">
+            <br>
+            <button type="button" onclick="saveUserChanges()">Enregistrer</button>
+        </form>
+    </div>
+</div>
+
+
+
+
                 </div>
             <% } %>
 
@@ -197,7 +455,7 @@
                     <h3 class="text-primary mb-4">Mes rendez-vous</h3>
                     <div class="action-buttons">
                         <button onclick="window.location.href='/appointments'">Voir mon agenda</button>
-                        <button onclick="window.location.href='/appointments'">Gérer mes disponibilités</button>
+                    
                     </div>
 
                     <div id="calendar"></div>
@@ -216,16 +474,7 @@
                 </div>
             <% } %>
 
-            <% if (user.role === 'doctor' || user.role === 'dentist') { %>
-                <div class="doctor-dentist-section">
-                    <h3 class="text-primary mb-4">Mes patients</h3>
-                    <div class="action-buttons">
-                        <button onclick="window.location.href='/patients'">Voir mes patients</button>
-                        <button onclick="window.location.href='/appointments'">Voir mes rendez-vous</button>
-                        <button onclick="window.location.href='/availability'">Gérer mes disponibilités</button>
-                    </div>
-                </div>
-            <% } %>
+         
         </div>
     </div>
 
@@ -264,19 +513,19 @@ async function initializeCalendar() {
         const response = await fetch('/api/appointments/my-appointments');
         const appointments = await response.json();
 
-        // Format appointments for calendar
         const events = appointments.map(apt => ({
-            id: apt._id,
-            title: `Rendez-vous ${apt.status}`,
-            start: new Date(apt.date),
-            backgroundColor: getStatusColor(apt.status),
-            extendedProps: {
-                status: apt.status,
-                description: apt.reason || 'Pas de description',
-                clientName: `${apt.client.firstName} ${apt.client.lastName}` // Ajouter le nom du client
-            }
-        }));
-
+    id: apt._id,
+    title: `Rendez-vous ${apt.status}`,
+    start: new Date(apt.date),
+    backgroundColor: getStatusColor(apt.status),
+    extendedProps: {
+        status: apt.status,
+        description: apt.reason || 'Pas de description',
+        clientName: apt.client 
+            ? `${apt.client.firstName} ${apt.client.lastName}` 
+            : 'Client inconnu' // Valeur par défaut si client est null
+    }
+}));
         // Initialize calendar
         const calendarEl = document.getElementById('calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -325,6 +574,265 @@ function showAppointmentDetails(event) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function fetchUsers() {
+    try {
+        const response = await fetch('/api/users/');
+        const users = await response.json();
+
+       
+
+
+        const usersContainer = document.getElementById('users-container');
+        usersContainer.innerHTML = ''; // Vider la liste avant d'ajouter les utilisateurs
+      
+     
+       
+        users.forEach(user => {
+            const userCard = document.createElement('div');
+            userCard.classList.add('user-card');
+
+            userCard.innerHTML = `
+                <h4>${user.firstName} ${user.lastName}</h4>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Rôle:</strong> ${user.role}</p>
+                <button onclick="editUser('${user._id}')">Modifier</button>
+                <button onclick="deleteUser('${user._id}')" style="background: red;">Supprimer</button>
+            `;
+
+            usersContainer.appendChild(userCard);
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des utilisateurs:', error);
+    }
+}
+
+
+
+
+async function editUser(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+        const user = await response.json();
+
+        if (!user) {
+            alert("Utilisateur introuvable !");
+            return;
+        }
+
+        // Remplir le formulaire avec les données actuelles
+        document.getElementById("editFirstName").value = user.firstName;
+        document.getElementById("editLastName").value = user.lastName;
+        document.getElementById("editEmail").value = user.email;
+        document.getElementById("editRole").value = user.role;
+
+        // Ajouter un attribut data-user-id pour récupérer l'ID au moment de la sauvegarde
+        document.getElementById("editUserForm").setAttribute("data-user-id", userId);
+
+        // Afficher la modale
+        document.getElementById("editUserModal").style.display = "flex";
+    } catch (error) {
+        console.error("Erreur:", error);
+    }
+}
+
+
+
+
+
+
+
+function closeModal() {
+    document.getElementById("editUserModal").style.display = "none";
+}
+
+async function saveUserChanges() {
+    const userId = document.getElementById("editUserForm").getAttribute("data-user-id");
+
+    const updatedUser = {
+        firstName: document.getElementById("editFirstName").value || '',
+        lastName: document.getElementById("editLastName").value || '',
+        email: document.getElementById("editEmail").value || '',
+        role: document.getElementById("editRole").value || ''
+    };
+
+    try {
+        const updateResponse = await fetch(`/api/users/${userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedUser)
+        });
+
+        const data = await updateResponse.json();
+        alert(data.message);
+        closeModal();
+        fetchUsers();
+    } catch (error) {
+        console.error("Erreur:", error);
+    }
+}
+
+
+
+
+
+function deleteUser(userId) {
+    if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+        fetch(`/api/users/${userId}`, {
+            method: "DELETE"
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchUsers(); // Rafraîchir la liste après suppression
+        })
+        .catch(error => console.error("Erreur:", error));
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
+
+
+<script>
+    // Fonction pour charger les statistiques et afficher le graphique
+    async function loadUserStats() {
+        try {
+            const response = await fetch('/api/users/stats');
+            const stats = await response.json();
+
+            // Récupération des données pour le graphique
+            const data = {
+                labels: ['Admin', 'Professionnels', 'Clients'],
+                datasets: [{
+                    label: 'Nombre d\'utilisateurs par rôle',
+                    data: [stats.adminCount, stats.professionalCount, stats.clientCount],
+                    backgroundColor: ['#FF5733', '#33FF57', '#3357FF'],
+                    borderColor: ['#FF5733', '#33FF57', '#3357FF'],
+                    borderWidth: 1
+                }]
+            };
+
+            // Configuration du graphique
+            const config = {
+                type: 'bar', // Type de graphique (barres)
+                data: data,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+
+            // Créer et afficher le graphique
+            const ctx = document.getElementById('userStatsChart').getContext('2d');
+            new Chart(ctx, config);
+
+        } catch (error) {
+            console.error('Erreur lors du chargement des statistiques:', error);
+        }
+    }
+
+    // Appeler la fonction pour charger les statistiques au chargement de la page
+    loadUserStats();
+</script>
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 </body>
 </html>

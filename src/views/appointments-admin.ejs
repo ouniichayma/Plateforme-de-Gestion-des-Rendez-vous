@@ -25,15 +25,7 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="dateRange">Période :</label>
-                <select id="dateRange" name="dateRange">
-                    <option value="today">Aujourd'hui</option>
-                    <option value="week">Cette semaine</option>
-                    <option value="month">Ce mois</option>
-                    <option value="all">Tous</option>
-                </select>
-            </div>
+           
 
             <button type="submit" class="btn-primary">Filtrer</button>
         </form>
@@ -41,7 +33,7 @@
 
     <div class="appointments-list">
         <h3>Liste des Rendez-vous</h3>
-        <div id="appointmentsList">
+        <div id="appointmentsList" >
             <!-- Les rendez-vous seront chargés ici dynamiquement -->
         </div>
     </div>
@@ -164,50 +156,54 @@
     }
 </style>
 
+
+
+
+
+
+
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const filterForm = document.getElementById('filterForm');
+    document.addEventListener('DOMContentLoaded', async function () {
+        await loadUsersAndAppointments();
     
-    // Gestionnaire pour le formulaire de filtres
-    if (filterForm) {
+        const filterForm = document.getElementById('filterForm');
         filterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            await loadAppointments();
+            await loadUsersAndAppointments();
         });
-    }
+    });
 
-    // Fonction pour charger les rendez-vous
-    async function loadAppointments() {
+
+    
+    async function loadUsersAndAppointments() {
         try {
             const professional = document.getElementById('professional').value;
             const status = document.getElementById('status').value;
-            const dateRange = document.getElementById('dateRange').value;
-
-            const queryParams = new URLSearchParams({
-                professional,
-                status,
-                dateRange
-            }).toString();
-
-            const response = await fetch(`/api/appointments/all?${queryParams}`);
-            const appointments = await response.json();
-            
+    
+            const queryParams = new URLSearchParams({ professional, status }).toString();
+            const response = await fetch(`/api/appointments/filtre?${queryParams}`);
+            const { users, appointments } = await response.json();
+    
+            // Affichage des utilisateurs dans le filtre "professionnel"
+            const professionalSelect = document.getElementById('professional');
+            professionalSelect.innerHTML = '<option value="">Tous les professionnels</option>';
+            users.filter(user => user.role === "professionnel").forEach(user => {
+                professionalSelect.innerHTML += `<option value="${user._id}">${user.firstName} ${user.lastName}</option>`;
+            });
+    
+            // Affichage des rendez-vous
             const appointmentsList = document.getElementById('appointmentsList');
-            
             if (appointments.length === 0) {
                 appointmentsList.innerHTML = '<p>Aucun rendez-vous trouvé</p>';
                 return;
             }
-
+    
             appointmentsList.innerHTML = appointments.map(appointment => `
                 <div class="appointment-card">
                     <h4>Rendez-vous le ${new Date(appointment.date).toLocaleDateString()} à ${appointment.time}</h4>
-                    <p>
-                        <strong>Professionnel:</strong> ${appointment.professional.firstName} ${appointment.professional.lastName}
-                    </p>
-                    <p>
-                        <strong>Client:</strong> ${appointment.client.firstName} ${appointment.client.lastName}
-                    </p>
+                    <p><strong>Professionnel:</strong> ${appointment.professional.firstName} ${appointment.professional.lastName}</p>
+                    <p><strong>Client:</strong> ${appointment.client.firstName} ${appointment.client.lastName}</p>
                     <p><strong>Motif:</strong> ${appointment.reason}</p>
                     <p>
                         <strong>Statut:</strong> 
@@ -222,25 +218,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `).join('');
+    
         } catch (error) {
             console.error('Erreur lors du chargement des rendez-vous:', error);
         }
     }
 
-    // Fonction pour supprimer un rendez-vous
-    window.deleteAppointment = async function(appointmentId) {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
-            return;
-        }
 
+
+
+    
+    
+    async function deleteAppointment(appointmentId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) return;
+    
         try {
-            const response = await fetch(`/api/appointments/${appointmentId}`, {
-                method: 'DELETE'
-            });
-
+            const response = await fetch(`/api/appointments/${appointmentId}`, { method: 'DELETE' });
+    
             if (response.ok) {
                 alert('Rendez-vous supprimé avec succès');
-                loadAppointments();
+                loadUsersAndAppointments();
             } else {
                 const result = await response.json();
                 alert(result.message || 'Erreur lors de la suppression');
@@ -250,8 +247,17 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Une erreur est survenue lors de la suppression');
         }
     }
+    </script>
+    
 
-    // Charger les rendez-vous au chargement de la page
-    loadAppointments();
-});
-</script>
+
+
+
+
+
+
+
+
+
+
+    

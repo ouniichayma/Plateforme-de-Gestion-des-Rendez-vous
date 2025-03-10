@@ -79,7 +79,7 @@ exports.getUserById = async (req, res) => {
 
 
 
-// Récupérer tous les utilisateurs de type "professionnel"
+// Récupérer tous les utilisateurs de type "professionnel" 
 exports.professionnel = async (req, res, next) => {
     try {
       console.log("Requête: ", { role: "professionnel" });
@@ -91,3 +91,36 @@ exports.professionnel = async (req, res, next) => {
     }
   };
   
+
+  exports.getUserStats = async (req, res) => {
+    try {
+        console.log('Début de la récupération des statistiques');
+
+        // Agrégation pour compter les utilisateurs par rôle
+        const stats = await User.aggregate([
+            {
+                $group: {
+                    _id: "$role", // Regrouper par le champ 'role'
+                    count: { $sum: 1 } // Compter le nombre d'utilisateurs par rôle
+                }
+            }
+        ]);
+
+        console.log('Statistiques des utilisateurs:', stats);
+
+        // Construire la réponse avec les résultats agrégés
+        const statsResult = {
+            adminCount: stats.find(stat => stat._id === 'admin')?.count || 0,
+            professionalCount: stats.find(stat => stat._id === 'professionnel')?.count || 0,
+            clientCount: stats.find(stat => stat._id === 'client')?.count || 0,
+        };
+
+        res.json(statsResult);
+    } catch (error) {
+        console.error('Erreur dans la récupération des statistiques:', error);
+        res.status(500).json({
+            message: 'Erreur serveur',
+            errorDetails: error.message || error
+        });
+    }
+};

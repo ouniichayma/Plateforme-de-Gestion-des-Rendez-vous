@@ -244,28 +244,44 @@
 
   // Fonction pour annuler un rendez-vous
   async function cancelAppointment(id) {
-      if (!confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
-          return;
-      }
+    if (!confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
+        return;
+    }
 
-      try {
-          const response = await fetch(`/api/appointments/${id}`, {
-              method: 'DELETE',
-              credentials: 'include'
-          });
+    try {
+        const response = await fetch(`/api/appointments/${id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
 
-          if (response.ok) {
-              alert('Rendez-vous annulé avec succès');
-              loadAppointments();
-          } else {
-              const data = await response.json();
-              alert(data.message || 'Erreur lors de l\'annulation du rendez-vous');
-          }
-      } catch (error) {
-          console.error('Erreur:', error);
-          alert('Erreur lors de l\'annulation du rendez-vous');
-      }
-  }
+        if (response.ok) {
+            alert('Rendez-vous annulé avec succès');
+            
+            // Vérifier si la modal existe avant de la cacher
+            const appointmentModalElement = document.getElementById('appointmentModal');
+if (appointmentModalElement) {
+    const appointmentModal = bootstrap.Modal.getInstance(appointmentModalElement);
+    if (appointmentModal) {
+        appointmentModal.hide();
+    }
+}
+            
+            window.location.reload();
+        } else {
+            const data = await response.json();
+            alert(data.message || "Erreur lors de l'annulation du rendez-vous");
+        }
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors de l'annulation du rendez-vous");
+    }
+}
+
+
+
+
+
+
 
   // Gérer la soumission du formulaire
   document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
